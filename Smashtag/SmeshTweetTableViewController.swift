@@ -7,29 +7,40 @@
 //
 
 import UIKit
+import CoreData
+import Twitter
+// 執行 CoreData 相關的邏輯，做的事情和 TwitterAPI 雷同，但是為了程式的相依性，將邏輯分開寫
+class SmeshTweetTableViewController: TweetTableViewController
+{
+    var container: NSPersistentContainer? = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer
 
-class SmeshTweetTableViewController: TweetTableViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+    override func insertTweets(_ newTweets: [Twitter.Tweet]) {
+        super.insertTweets(newTweets)
+        updateDatabase(with: newTweets)
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    private func updateDatabase(with tweets: [Twitter.Tweet]) {
+        container?.performBackgroundTask{ context in
+            for twitterInfo in tweets {
+                _ = try? Tweet.findOrCreateTweet(matching: twitterInfo, in: context)
+            }
+            try? context.save()
+        }
     }
-    
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "Tweeters Mentioning Search Term" {
+            if let tweetersTVC = segue.destination as? SmashTweetersTableViewController {
+                tweetersTVC.mention = searchText
+                tweetersTVC.container = container
+            }
+        } else if segue.identifier == "Mentions Information" {
+            if let tweeterMentionTVC = segue.destination as? TweeterMentionTableViewController {
+                if let cell = sender as? TweetTableViewCell {
+                    let indexPath = tableView.indexPath(for: cell)
+                    tweeterMentionTVC.selectedTweet = getTweet(by: indexPath!)
+                }
+            }
+        }
     }
-    */
-
 }

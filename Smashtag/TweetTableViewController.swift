@@ -7,89 +7,104 @@
 //
 
 import UIKit
+import Twitter
 
-class TweetTableViewController: UITableViewController {
+class TweetTableViewController: UITableViewController, UITextFieldDelegate
+{
+    private var tweets = [Array<Twitter.Tweet>]()
+
+    func getTweet(by indexPath: IndexPath) -> Twitter.Tweet {
+        return tweets[indexPath.section][indexPath.row]
+    }
+
+    var searchText: String? {
+        didSet {
+            searchTextFiled?.text = searchText
+            searchTextFiled?.resignFirstResponder()
+            lastTwitterRequest = nil
+            tweets.removeAll()
+            tableView.reloadData()
+            searchForTweets()
+            title = searchText
+        }
+    }
+
+    func insertTweets(_ newTweets: [Twitter.Tweet]) {
+        self.tweets.insert(newTweets, at: 0)
+        self.tableView.insertSections([0], with: .fade)
+    }
+
+    private func twitterRequest() -> Twitter.Request? {
+        if let query = searchText, !query.isEmpty {
+            return Twitter.Request(search: query, count: 100)
+        }
+        return nil
+    }
+
+    private var lastTwitterRequest: Twitter.Request?
+
+    private func searchForTweets() {
+        if let request = lastTwitterRequest?.newer ?? twitterRequest() {
+            lastTwitterRequest = request  // 當 request 產生時存起來比較 backgroundThread 回來的 request 是否一樣
+            request.fetchTweets { [weak self] newTweets in
+                DispatchQueue.main.async {  // 關於 UI 的邏輯要切回去 mainQueue
+                    if request == self?.lastTwitterRequest {
+                        self?.insertTweets(newTweets)
+                    }
+                    self?.refreshControl?.endRefreshing()
+                }
+            }
+        } else {
+            self.refreshControl?.endRefreshing()
+        }
+    }
+    
+    @IBOutlet weak var searchTextFiled: UITextField! {
+        didSet {
+            searchTextFiled.delegate = self
+        } // 在 iOS 把 searchTextFiled 建好的時候就立刻指派 Delegate
+    }
+
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == searchTextFiled {
+            searchText = searchTextFiled.text
+        }
+        return true
+    }
+
+    @IBAction func refresh(_ sender: Any) {
+        searchForTweets()
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        tableView.estimatedRowHeight = tableView.rowHeight      // tableView 需要預設高度，所以直接給 rowHight
+        tableView.rowHeight = UITableViewAutomaticDimension     // 告訴 tableView rowHight 是 AutomaticDimension
     }
 
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
+
+        return tweets.count
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
+
+        return tweets[section].count
     }
 
-    /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Tweet", for: indexPath)
+        let tweet: Twitter.Tweet = tweets[indexPath.section][indexPath.row]
+        if let tweetCell = cell as? TweetTableViewCell {
+            tweetCell.tweet = tweet
+        }
+        
         return cell
     }
-    */
 
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "\(tweets.count - section)"
     }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
