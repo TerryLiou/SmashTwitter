@@ -18,10 +18,14 @@ class MentionTableViewCell: UITableViewCell
             updateUI()
         }
     }
-    var mentionSectionHeaderTitle = ""
+    var mentionSectionType: MentionTypes? {
+        didSet{
+            updateUI()
+        }
+    }
     var indexForRow = 0
 
-    private let ditailLabel = UILabel()
+    private let detailLabel = UILabel()
     private var lastmMediaUrl: URL?
     private let mentionImageView = UIImageView()
 
@@ -38,50 +42,42 @@ class MentionTableViewCell: UITableViewCell
     }
 
     private func setLabelConstains() {
-        contentView.addSubview(ditailLabel)
-        ditailLabel.translatesAutoresizingMaskIntoConstraints = false
-        ditailLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-        ditailLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8).isActive = true
+        contentView.addSubview(detailLabel)
+        detailLabel.translatesAutoresizingMaskIntoConstraints = false
+        detailLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
+        detailLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8).isActive = true
     }
 
     private func updateUI() {
-        switch mentionSectionHeaderTitle {
-        case "Image":
-            if let mediaUrl = selectedTweetForCell?.media[indexForRow].url {
-                lastmMediaUrl = mediaUrl
-                DispatchQueue.global().async { [weak self] in
-                    if let imageData = try? Data(contentsOf: mediaUrl) {
-                        if self?.lastmMediaUrl == mediaUrl {
-                            DispatchQueue.main.async {
-                                self?.mentionImageView.image = UIImage(data: imageData)
-                                self?.setUpImageView()
+        if mentionSectionType != nil {
+            switch mentionSectionType! {
+            case .media:
+                if let mediaUrl = selectedTweetForCell?.media[indexForRow].url {
+                    lastmMediaUrl = mediaUrl
+                    DispatchQueue.global().async { [weak self] in
+                        if let imageData = try? Data(contentsOf: mediaUrl) {
+                            if self?.lastmMediaUrl == mediaUrl {
+                                DispatchQueue.main.async {
+                                    self?.mentionImageView.image = UIImage(data: imageData)
+                                    self?.setUpImageView()
+                                }
                             }
                         }
                     }
                 }
+
+            case .hashtags:
+                setLabelConstains()
+                detailLabel.text = selectedTweetForCell?.hashtags[indexForRow].keyword
+
+            case .urls:
+                setLabelConstains()
+                detailLabel.text = selectedTweetForCell?.urls[indexForRow].keyword
+
+            case .userMention:
+                setLabelConstains()
+                detailLabel.text = selectedTweetForCell?.userMentions[indexForRow].keyword
             }
-
-        case "Hashtags":
-            setLabelConstains()
-            ditailLabel.text = selectedTweetForCell?.hashtags[indexForRow].keyword
-
-        case "Mention Urls":
-            setLabelConstains()
-            ditailLabel.text = selectedTweetForCell?.urls[indexForRow].keyword
-
-        case "Mention Tweeter":
-            setLabelConstains()
-            ditailLabel.text = selectedTweetForCell?.userMentions[indexForRow].keyword
-
-        default:
-            break
         }
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-
 }

@@ -11,13 +11,6 @@ import Twitter
 
 class TweeterMentionTableViewController: UITableViewController
 {
-    private enum MentionTypes: String {
-        case media = "Image"
-        case hashtags = "Hashtags"
-        case urls = "Mention Urls"
-        case userMention = "Mention Tweeter"
-    }
-    
     private var mentionTypes = [(mentionType: MentionTypes, itemsCouny: Int)]() // Array in MentionTypes and items quantity
 
     var selectedTweet: Twitter.Tweet? {
@@ -62,11 +55,10 @@ class TweeterMentionTableViewController: UITableViewController
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MentionTableViewCell", for: indexPath)
-        let sectionHeaderTitle = mentionTypes[indexPath.section].mentionType.rawValue
 
         if let mentionCell = cell as? MentionTableViewCell, selectedTweet != nil {
             mentionCell.indexForRow = indexPath.row
-            mentionCell.mentionSectionHeaderTitle = sectionHeaderTitle
+            mentionCell.mentionSectionType = mentionTypes[indexPath.section].mentionType
             mentionCell.selectedTweetForCell = selectedTweet!
         }
 
@@ -79,6 +71,22 @@ class TweeterMentionTableViewController: UITableViewController
             return tableView.frame.width / CGFloat(tweet.media[indexPath.row].aspectRatio)
         } else {
             return UITableViewAutomaticDimension
+        }
+    }
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        switch mentionTypes[indexPath.section].mentionType {
+        case .media:
+            print("media")
+
+        case .urls:
+            print("url")
+
+        default :
+            if let newSearchVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TweetTableViewController") as? TweetTableViewController {
+                newSearchVC.searchText = (mentionTypes[indexPath.section].mentionType == .hashtags) ? selectedTweet?.hashtags[indexPath.row].keyword : selectedTweet?.userMentions[indexPath.row].keyword
+                navigationController?.pushViewController(newSearchVC, animated: true)
+            }
         }
     }
 }
