@@ -27,18 +27,14 @@ class MentionTableViewCell: UITableViewCell
 
     private let detailLabel = UILabel()
     private var lastmMediaUrl: URL?
-    private let mentionImageView = UIImageView()
+    let mentionImageView = UIImageView()
 
     private func setUpImageView() {
         contentView.addSubview(mentionImageView)
         mentionImageView.frame = CGRect(x: 0, y: 0, width: contentView.bounds.width,
                                         height: contentView.bounds.width / CGFloat((selectedTweetForCell?.media[indexForRow].aspectRatio)!))
         mentionImageView.contentMode = .scaleAspectFit
-        mentionImageView.translatesAutoresizingMaskIntoConstraints = false
-        mentionImageView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        mentionImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-        mentionImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        mentionImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        setConstraintsToBoundary(from: mentionImageView, To: contentView)
     }
 
     private func setLabelConstains() {

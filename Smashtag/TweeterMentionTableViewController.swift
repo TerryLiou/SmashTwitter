@@ -37,7 +37,6 @@ class TweeterMentionTableViewController: UITableViewController
         if tweet.userMentions.count != 0 {
             mentionTypes.append((.userMention, tweet.userMentions.count))
         }
-
         return mentionTypes
     }
 
@@ -75,17 +74,31 @@ class TweeterMentionTableViewController: UITableViewController
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        switch mentionTypes[indexPath.section].mentionType {
-        case .media:
-            print("media")
+        if let tweet = selectedTweet {
+            switch mentionTypes[indexPath.section].mentionType {
+            case .media:
+                if let MentionCell = tableView.cellForRow(at: indexPath) as? MentionTableViewCell {
+                    let image = MentionCell.mentionImageView.image
+                    let imageScrollViewController = ScrollViewController()
+                    imageScrollViewController.mentionImage = image
+                    navigationController?.pushViewController(imageScrollViewController, animated: true)
+                }
+                print("media")
 
-        case .urls:
-            print("url")
+            case .urls:
+                if let url = URL(string: tweet.urls[indexPath.row].keyword) {
+                    if UIApplication.shared.canOpenURL(url) {
+                        UIApplication.shared.open(url)
+                    } else {
+                        makeSimpleAlert(title: "Error", message: "Oop! This is an invalid URL.")
+                    }
+                }
 
-        default :
-            if let newSearchVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TweetTableViewController") as? TweetTableViewController {
-                newSearchVC.searchText = (mentionTypes[indexPath.section].mentionType == .hashtags) ? selectedTweet?.hashtags[indexPath.row].keyword : selectedTweet?.userMentions[indexPath.row].keyword
-                navigationController?.pushViewController(newSearchVC, animated: true)
+            default :
+                if let newSearchVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TweetTableViewController") as? TweetTableViewController {
+                    newSearchVC.searchText = (mentionTypes[indexPath.section].mentionType == .hashtags) ? tweet.hashtags[indexPath.row].keyword : tweet.userMentions[indexPath.row].keyword
+                    navigationController?.pushViewController(newSearchVC, animated: true)
+                }
             }
         }
     }
