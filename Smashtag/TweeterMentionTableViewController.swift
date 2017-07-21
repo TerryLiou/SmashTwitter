@@ -79,11 +79,10 @@ class TweeterMentionTableViewController: UITableViewController
             case .media:
                 if let MentionCell = tableView.cellForRow(at: indexPath) as? MentionTableViewCell {
                     let image = MentionCell.mentionImageView.image
-                    let imageScrollViewController = ScrollViewController()
+                    let imageScrollViewController = ImageScrollViewController()
                     imageScrollViewController.mentionImage = image
                     navigationController?.pushViewController(imageScrollViewController, animated: true)
                 }
-                print("media")
 
             case .urls:
                 if let url = URL(string: tweet.urls[indexPath.row].keyword) {
@@ -99,6 +98,18 @@ class TweeterMentionTableViewController: UITableViewController
                     newSearchVC.searchText = (mentionTypes[indexPath.section].mentionType == .hashtags) ? tweet.hashtags[indexPath.row].keyword : tweet.userMentions[indexPath.row].keyword
                     navigationController?.pushViewController(newSearchVC, animated: true)
                 }
+            }
+        }
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if UIDevice.current.orientation.isLandscape, mentionTypes[0].mentionType == .media {
+            if let MentionCell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? MentionTableViewCell {
+                let image = MentionCell.mentionImageView.image
+                let imageScrollViewController = ImageScrollViewController()
+                imageScrollViewController.mentionImage = image
+                navigationController?.pushViewController(imageScrollViewController, animated: true)
             }
         }
     }

@@ -9,21 +9,22 @@
 import UIKit
 import CoreData
 import Twitter
-// 執行 CoreData 相關的邏輯，做的事情和 TwitterAPI 雷同，但是為了程式的相依性，將邏輯分開寫
+// 執行 CoreData 相關的邏輯，做的事情和 TwitterAPI 雷同，但是為了避免程式的相依性，將邏輯分開寫
 class SmeshTweetTableViewController: TweetTableViewController
 {
     var container: NSPersistentContainer? = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer
 
-    override func insertTweets(_ newTweets: [Twitter.Tweet]) {
-        super.insertTweets(newTweets)
-        updateDatabase(with: newTweets)
+    override func insertTweets(_ newTweets: [Twitter.Tweet], and searchText: String?) {
+        super.insertTweets(newTweets, and: searchText)
+        updateDatabase(with: newTweets, and: searchText)
     }
 
-    private func updateDatabase(with tweets: [Twitter.Tweet]) {
+    private func updateDatabase(with tweets: [Twitter.Tweet], and searchText: String?) {
         container?.performBackgroundTask{ context in
             for twitterInfo in tweets {
                 _ = try? Tweet.findOrCreateTweet(matching: twitterInfo, in: context)
             }
+            _ = try? SearchTerm.updateSearchTexts(with: searchText, in: context)
             try? context.save()
         }
     }

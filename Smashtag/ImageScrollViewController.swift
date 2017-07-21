@@ -1,18 +1,18 @@
 //
-//  ScrollViewController.swift
+//  ImageScrollViewController.swift
 //  Smashtag
 //
-//  Created by 劉洧熏 on 2017/7/20.
+//  Created by 劉洧熏 on 2017/7/21.
 //  Copyright © 2017年 劉洧熏. All rights reserved.
 //
 
 import UIKit
 
-class ScrollViewController: UIViewController, UIScrollViewDelegate
+class ImageScrollViewController: UIViewController, UIScrollViewDelegate
 {
     private var imageScrollView = UIScrollView()
     private var mentionImageView = UIImageView()
-    
+
     var mentionImage: UIImage? {
         didSet {
             if let image = mentionImage {
@@ -29,6 +29,7 @@ class ScrollViewController: UIViewController, UIScrollViewDelegate
         imageScrollView.delegate = self
         imageScrollView.addSubview(mentionImageView)
         imageScrollView.contentSize = mentionImageView.bounds.size
+        imageScrollView.contentOffset = CGPoint().getPointAboutContentOffToCenter(by: mentionImageView, and: view)
         imageScrollView.zoomScale = getSuitableScale(by: mentionImage!).minimumScale
         imageScrollView.reloadInputViews()
     }
@@ -46,9 +47,8 @@ class ScrollViewController: UIViewController, UIScrollViewDelegate
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if let navigationCV = navigationController {
-            navigationCV.isNavigationTransparent = true
-        }
+        navigationController?.isNavigationTransparent = true
+        tabBarController?.tabBar.isHidden = true
     }
 
     override func viewDidLayoutSubviews() {
@@ -64,6 +64,7 @@ class ScrollViewController: UIViewController, UIScrollViewDelegate
         super.viewWillDisappear(animated)
         if let navigationCV = navigationController {
             navigationCV.isNavigationTransparent = false
+            tabBarController?.tabBar.isHidden = false
         }
     }
 }

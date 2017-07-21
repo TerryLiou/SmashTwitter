@@ -11,8 +11,18 @@ import CoreData
 
 class SmashTweetersTableViewController: FetchedResultsTableViewController
 {
-    var mention: String? { didSet { updateUI() } }
-    var container: NSPersistentContainer? = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer { didSet { updateUI() } }
+    var mention: String? {
+        didSet {
+            updateUI()
+        }
+    }
+
+    var container: NSPersistentContainer? = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer {
+        didSet {
+            updateUI()
+        }
+    }
+    
     var fetchedResultsController: NSFetchedResultsController<TwitterUser>? {
         didSet { fetchedResultsController?.delegate = self }
     }
@@ -49,9 +59,6 @@ class SmashTweetersTableViewController: FetchedResultsTableViewController
         request.predicate = NSPredicate(format: "text contains[c] %@ and tweeter = %@", mention!, twitterUser)
         return (try? twitterUser.managedObjectContext!.count(for: request)) ?? 0
     }
-}
-
-extension SmashTweetersTableViewController {
 
     //MARK: UITableViewDateSource
 

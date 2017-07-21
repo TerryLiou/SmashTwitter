@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="12141" systemVersion="16F73" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="SearchTerm" representedClassName=".SearchTerm" syncable="YES" codeGenerationType="category">
+        <attribute name="searchTexts" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="searchTime" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+    </entity>
     <entity name="Tweet" representedClassName=".Tweet" syncable="YES" codeGenerationType="category">
         <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
@@ -14,5 +18,6 @@
     <elements>
         <element name="Tweet" positionX="6469" positionY="1485" width="128" height="103"/>
         <element name="TwitterUser" positionX="6264" positionY="1485" width="128" height="88"/>
+        <element name="SearchTerm" positionX="6363" positionY="1521" width="128" height="75"/>
     </elements>
 </model>

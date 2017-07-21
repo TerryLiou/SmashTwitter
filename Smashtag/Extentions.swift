@@ -26,6 +26,20 @@ extension UIView {
         subview.leadingAnchor.constraint(equalTo: superView.leadingAnchor).isActive = true
         subview.trailingAnchor.constraint(equalTo: superView.trailingAnchor).isActive = true
     }
+
+    func setConstainsAtCenter(from subview: UIView, To superView: UIView) {
+        subview.translatesAutoresizingMaskIntoConstraints = false
+        subview.centerXAnchor.constraint(equalTo: superView.centerXAnchor).isActive = true
+        subview.centerYAnchor.constraint(equalTo: superView.centerYAnchor).isActive = true
+    }
+
+    func getDefaultIndicator(type: UIActivityIndicatorViewStyle, center: CGPoint) -> UIActivityIndicatorView {
+        let indicator = UIActivityIndicatorView()
+        indicator.center = center
+        indicator.activityIndicatorViewStyle = type
+        indicator.hidesWhenStopped = true
+        return indicator
+    }
 }
 
 extension UINavigationController {
@@ -45,5 +59,13 @@ extension UINavigationController {
                 self.navigationBar.isTranslucent = false
             }
         }
+    }
+}
+
+extension CGPoint {
+    func getPointAboutContentOffToCenter(by contentView: UIView, and superView: UIView) -> CGPoint {
+        let contentOffsetX = abs(contentView.bounds.width / 2 - superView.bounds.width / 2)
+        let contentOffsetY = abs(contentView.bounds.height / 2 - superView.bounds.height / 2)
+        return CGPoint(x: contentOffsetX, y: contentOffsetY)
     }
 }

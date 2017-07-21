@@ -21,7 +21,11 @@ class TweetTableViewCell: UITableViewCell
     @IBOutlet weak var tweetUserLabel: UILabel!
     @IBOutlet weak var tweetTextLabel: UILabel!
 
-    var tweet: Twitter.Tweet? { didSet { updateUI() } }
+    var tweet: Twitter.Tweet? {
+        didSet {
+            updateUI()
+        }
+    }
 
     private var lastProfileImageURL: URL?
 
@@ -64,15 +68,15 @@ class TweetTableViewCell: UITableViewCell
 
     private func setTextColor(with text: String) -> NSMutableAttributedString {  // 將 text 裡的 Mention 選項換顏色
         let mutableString = NSMutableAttributedString(string: text)
-        let mentionThingArray = [(tweet?.hashtags, UIColor.red),
-                                 (tweet?.urls, UIColor.blue),
-                                 (tweet?.userMentions, UIColor.cyan)]
+        let mentionThingArray: [(mention: [Mention]?, color: UIColor)] = [(tweet?.hashtags, UIColor.red),
+                                                                          (tweet?.urls, UIColor.blue),
+                                                                          (tweet?.userMentions, UIColor.cyan)]
         for mentionThingInfo in mentionThingArray {
-            if mentionThingInfo.0?.count != 0 {
+            if mentionThingInfo.mention?.count != 0 {
                 for index in 0 ..< (mentionThingInfo.0?.count)! {
                     mutableString.addAttribute(NSForegroundColorAttributeName,
-                                               value: mentionThingInfo.1,
-                                               range: (mentionThingInfo.0?[index].nsrange)!)
+                                               value: mentionThingInfo.color,
+                                               range: (mentionThingInfo.mention?[index].nsrange)!)
                 }
             }
         }
@@ -81,7 +85,7 @@ class TweetTableViewCell: UITableViewCell
     }
 }
 
-extension UIView {
+extension UIImageView {
     public func gotCricleView() {
         self.layer.cornerRadius = self.bounds.height / 2
         self.layer.masksToBounds = true
