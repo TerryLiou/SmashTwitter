@@ -63,9 +63,9 @@ extension UINavigationController {
 }
 
 extension CGPoint {
-    func getPointAboutContentOffToCenter(by contentView: UIView, and superView: UIView) -> CGPoint {
-        let contentOffsetX = abs(contentView.bounds.width / 2 - superView.bounds.width / 2)
-        let contentOffsetY = abs(contentView.bounds.height / 2 - superView.bounds.height / 2)
+    func getPointAboutContentOffsetToCenter(by contentView: UIView, and superView: UIView) -> CGPoint {
+        let contentOffsetX = abs(contentView.frame.width / 2 - superView.frame.width / 2)
+        let contentOffsetY = abs(contentView.frame.height / 2 - superView.frame.height / 2)
         return CGPoint(x: contentOffsetX, y: contentOffsetY)
     }
 }

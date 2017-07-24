@@ -11,17 +11,8 @@ import Twitter
 
 class TweetTableViewController: UITableViewController, UITextFieldDelegate
 {
-    private var tweets = [Array<Twitter.Tweet>]()
+    private var tweets: [Twitter.Tweet] = []
     private var backgroudImageView = UIImageView(image: #imageLiteral(resourceName: "twitter-logo_22"))
-    private let spinner = UIActivityIndicatorView()
-
-    private func setUpSpinner() {
-        spinner.center = view.center
-        spinner.activityIndicatorViewStyle = .whiteLarge
-        tableView.backgroundView?.addSubview(spinner)
-        spinner.hidesWhenStopped = true
-        
-    }
 
     private func setuptableView() {
         backgroudImageView.contentMode = .center
@@ -33,7 +24,7 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate
     }
 
     func getTweet(by indexPath: IndexPath) -> Twitter.Tweet {
-        return tweets[indexPath.section][indexPath.row]
+        return tweets[indexPath.row]
     }
 
     var searchText: String? {
@@ -48,8 +39,9 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate
     }
 
     func insertTweets(_ newTweets: [Twitter.Tweet], and searchText: String?) {
-        self.tweets.insert(newTweets, at: 0)
-        self.tableView.insertSections([0], with: .fade)
+        self.tweets = newTweets + tweets
+        tableView.reloadData()
+//        self.tableView.insertSections([0], with: .fade)
     }
 
     private func twitterRequest() -> Twitter.Request? {
@@ -62,7 +54,7 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate
     private var lastTwitterRequest: Twitter.Request?
 
     private func searchForTweets(by searchText: String?) {
-        spinner.startAnimating()
+        refreshControl?.beginRefreshing()
         tableView.separatorStyle = UITableViewCellSeparatorStyle.none
         if let request = lastTwitterRequest?.newer ?? twitterRequest() {
             lastTwitterRequest = request  // 當 request 產生時存起來比較 backgroundThread 回來的 request 是否一樣
@@ -101,33 +93,30 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate
         tableView.estimatedRowHeight = tableView.rowHeight      // tableView 需要預設高度，所以直接給 rowHight
         tableView.rowHeight = UITableViewAutomaticDimension     // 告訴 tableView rowHight 是 AutomaticDimension
         setuptableView()
-        setUpSpinner()
-
     }
 
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return tweets.count
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tweets[section].count
+        return tweets.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        spinner.stopAnimating()
         tableView.separatorStyle = UITableViewCellSeparatorStyle.singleLine
         let cell = tableView.dequeueReusableCell(withIdentifier: "Tweet", for: indexPath)
-        let tweet: Twitter.Tweet = tweets[indexPath.section][indexPath.row]
+        let tweet: Twitter.Tweet = tweets[indexPath.row]
         if let tweetCell = cell as? TweetTableViewCell {
             tweetCell.tweet = tweet
         }
         
         return cell
     }
-
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "\(tweets.count - section)"
-    }
+//
+//    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+//        return "\(tweets.count - section)"
+//    }
 }

@@ -29,7 +29,7 @@ class SmeshTweetTableViewController: TweetTableViewController
         }
     }
 
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {  // 不是 CoreData 的邏輯... ＠＠
         if segue.identifier == "Tweeters Mentioning Search Term" {
             if let tweetersTVC = segue.destination as? SmashTweetersTableViewController {
                 tweetersTVC.mention = searchText

@@ -19,6 +19,7 @@ class ImageScrollViewController: UIViewController, UIScrollViewDelegate
                 mentionImageView.image = image
                 mentionImageView.frame = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
                 setUpScrollView()
+                setupImageScale(image, view.frame.size)
             }
         }
     }
@@ -28,10 +29,16 @@ class ImageScrollViewController: UIViewController, UIScrollViewDelegate
         self.automaticallyAdjustsScrollViewInsets = false
         imageScrollView.delegate = self
         imageScrollView.addSubview(mentionImageView)
-        imageScrollView.contentSize = mentionImageView.bounds.size
-        imageScrollView.contentOffset = CGPoint().getPointAboutContentOffToCenter(by: mentionImageView, and: view)
-        imageScrollView.zoomScale = getSuitableScale(by: mentionImage!).minimumScale
-        imageScrollView.reloadInputViews()
+        imageScrollView.contentSize = mentionImageView.frame.size
+//        imageScrollView.reloadInputViews()
+    }
+
+    private func setupImageScale(_ image: UIImage, _ size: CGSize) {
+        imageScrollView.frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+        imageScrollView.minimumZoomScale = getSuitableScale(by: image).minimumScale
+        imageScrollView.maximumZoomScale = getSuitableScale(by: image).maximumScale
+        imageScrollView.zoomScale = getSuitableScale(by: image).minimumScale
+        imageScrollView.contentOffset = CGPoint().getPointAboutContentOffsetToCenter(by: mentionImageView, and: imageScrollView)
     }
 
     private func getSuitableScale(by image: UIImage) -> (minimumScale: CGFloat, maximumScale: CGFloat) {
@@ -51,13 +58,10 @@ class ImageScrollViewController: UIViewController, UIScrollViewDelegate
         tabBarController?.tabBar.isHidden = true
     }
 
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        imageScrollView.frame = self.view.frame
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
         guard let image = mentionImage else { return }
-        imageScrollView.minimumZoomScale = getSuitableScale(by: image).minimumScale
-        imageScrollView.maximumZoomScale = getSuitableScale(by: image).maximumScale
-        imageScrollView.zoomScale = getSuitableScale(by: image).minimumScale
+        setupImageScale(image, size)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
