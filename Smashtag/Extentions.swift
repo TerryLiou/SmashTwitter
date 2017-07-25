@@ -33,11 +33,12 @@ extension UIView {
         subview.centerYAnchor.constraint(equalTo: superView.centerYAnchor).isActive = true
     }
 
-    func getDefaultIndicator(type: UIActivityIndicatorViewStyle, center: CGPoint) -> UIActivityIndicatorView {
+    func getDefaultIndicator(type: UIActivityIndicatorViewStyle, center: CGPoint, color: UIColor) -> UIActivityIndicatorView {
         let indicator = UIActivityIndicatorView()
         indicator.center = center
         indicator.activityIndicatorViewStyle = type
         indicator.hidesWhenStopped = true
+        indicator.color = color
         return indicator
     }
 }
