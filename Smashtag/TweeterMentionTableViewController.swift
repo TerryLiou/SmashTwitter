@@ -18,8 +18,6 @@ class TweeterMentionTableViewController: UITableViewController
             if selectedTweet != nil {
                 _ = makeTweeterMentionSection(by: selectedTweet!)
             }
-//            tableView.register(UINib(nibName: "MentionImageTableViewCell", bundle: nil), forCellReuseIdentifier: "Mention Image Cell")
-//            tableView.register(UINib(nibName: "MentionLabelTableViewCell", bundle: nil), forCellReuseIdentifier: "SearchText Cell")
         }
     }
 

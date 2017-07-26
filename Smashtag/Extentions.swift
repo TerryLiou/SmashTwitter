@@ -70,3 +70,10 @@ extension CGPoint {
         return CGPoint(x: contentOffsetX, y: contentOffsetY)
     }
 }
+
+extension UIImageView {
+    public func gotCricleView() {
+        self.layer.cornerRadius = self.bounds.height / 2
+        self.layer.masksToBounds = true
+    }
+}

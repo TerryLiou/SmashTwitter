@@ -27,7 +27,7 @@ class SearchTermTableViewController: FetchedResultsTableViewController {
                 cacheName: nil)
         }
         try? fetchedResultsController?.performFetch()
-        tableView.reloadData()
+//        tableView.reloadData()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -70,20 +70,36 @@ class SearchTermTableViewController: FetchedResultsTableViewController {
         }
     }
 
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if let sections = fetchedResultsController?.sections, sections.count > 0 {
-            return sections[section].name
-        } else {
-            return nil
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == UITableViewCellEditingStyle.delete {
+            let record = fetchedResultsController?.object(at: indexPath)
+            fetchedResultsController?.managedObjectContext.delete(record!)
         }
     }
 
-    override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
-        return fetchedResultsController?.sectionIndexTitles
-    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.reloadData()
+    } // 為了搜尋完立刻點擊 tabbar 切換過去顯示正確的搜尋紀錄
 
-    override func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
-        return fetchedResultsController?.section(forSectionIndexTitle: title, at: index) ?? 0
-    }
+//    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+//        if let sections = fetchedResultsController?.sections, sections.count > 0 {
+//            return sections[section].name
+//        } else {
+//            return nil
+//        }
+//    }
+//
+//    override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+//        return fetchedResultsController?.sectionIndexTitles
+//    }
+//
+//    override func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
+//        return fetchedResultsController?.section(forSectionIndexTitle: title, at: index) ?? 0
+//    }
 }
 

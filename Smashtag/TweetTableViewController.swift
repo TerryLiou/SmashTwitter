@@ -54,7 +54,9 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate
     private var lastTwitterRequest: Twitter.Request?
 
     private func searchForTweets(by searchText: String?) {
-        refreshControl?.beginRefreshing()
+        let spinner = tableView.getDefaultIndicator(type: .whiteLarge, center: tableView.center, color: UIColor.black)
+        tableView.addSubview(spinner)
+        spinner.startAnimating()
         tableView.separatorStyle = UITableViewCellSeparatorStyle.none
         if let request = lastTwitterRequest?.newer ?? twitterRequest() {
             lastTwitterRequest = request  // 當 request 產生時存起來比較 backgroundThread 回來的 request 是否一樣
@@ -63,11 +65,13 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate
                     if request == self?.lastTwitterRequest {
                         self?.insertTweets(newTweets, and: searchText)
                     }
+                    spinner.stopAnimating()
                     self?.refreshControl?.endRefreshing()
                 }
             }
         } else {
-            self.refreshControl?.endRefreshing()
+            spinner.stopAnimating()
+            refreshControl?.endRefreshing()
         }
     }
     
@@ -115,8 +119,25 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate
         
         return cell
     }
-//
-//    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        return "\(tweets.count - section)"
-//    }
+
+    @objc private func reload() {  // 上拉加載
+        searchForTweets(by: nil)
+        tableView.tableFooterView = nil
+        tableView.setContentOffset(CGPoint.zero, animated:true)
+        tableView.reloadData()
+    }
+
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row == tweets.count - 1 {
+            let loadMoewView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 40))
+            let touch = UITapGestureRecognizer(target: self, action: #selector(reload))
+            let label = UILabel(frame: loadMoewView.frame)
+            label.text = "Click Here To Reload"
+            label.textAlignment = .center
+            loadMoewView.backgroundColor = .lightGray
+            loadMoewView.addSubview(label)
+            loadMoewView.addGestureRecognizer(touch)
+            tableView.tableFooterView = loadMoewView
+        }
+    }
 }
