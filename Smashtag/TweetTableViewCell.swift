@@ -21,6 +21,8 @@ class TweetTableViewCell: UITableViewCell
     @IBOutlet weak var tweetUserLabel: UILabel!
     @IBOutlet weak var tweetTextLabel: UILabel!
 
+    var imageCache = NSCache<NSURL, UIImage>()
+
     var tweet: Twitter.Tweet? {
         didSet {
             updateUI()
@@ -39,12 +41,17 @@ class TweetTableViewCell: UITableViewCell
         tweetUserLabel?.text = tweet?.user.description
 
         if let profileImageURL = tweet?.user.profileImageURL {
-            lastProfileImageURL = profileImageURL
-            DispatchQueue.global().async { [weak self] in
-                if let imageData = try? Data(contentsOf: profileImageURL) {
-                    if self?.lastProfileImageURL == profileImageURL {
-                        DispatchQueue.main.async {
-                            self?.tweetProfileImageView?.image = UIImage(data: imageData)
+            if let image = imageCache.object(forKey: profileImageURL as NSURL) {
+                tweetProfileImageView.image = image
+            } else {
+                lastProfileImageURL = profileImageURL
+                DispatchQueue.global().async { [weak self] in
+                    if let imageData = try? Data(contentsOf: profileImageURL) {
+                        if self?.lastProfileImageURL == profileImageURL {
+                            DispatchQueue.main.async {
+                                self?.tweetProfileImageView?.image = UIImage(data: imageData)
+                                self?.imageCache.setObject(UIImage(data: imageData)!, forKey: profileImageURL as NSURL)
+                            }
                         }
                     }
                 }
