@@ -18,8 +18,8 @@ class TweeterMentionTableViewController: UITableViewController
             if selectedTweet != nil {
                 _ = makeTweeterMentionSection(by: selectedTweet!)
             }
-            tableView.register(UINib(nibName: "MentionImageTableViewCell", bundle: nil), forCellReuseIdentifier: "Mention Image Cell")
-            tableView.register(UINib(nibName: "MentionLabelTableViewCell", bundle: nil), forCellReuseIdentifier: "SearchText Cell")
+//            tableView.register(UINib(nibName: "MentionImageTableViewCell", bundle: nil), forCellReuseIdentifier: "Mention Image Cell")
+//            tableView.register(UINib(nibName: "MentionLabelTableViewCell", bundle: nil), forCellReuseIdentifier: "SearchText Cell")
         }
     }
 
@@ -55,15 +55,15 @@ class TweeterMentionTableViewController: UITableViewController
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cellIdentifier = mentionTypes[indexPath.section].mentionType == .media ? "Mention Image Cell": "SearchText Cell"
+        let cellIdentifier = mentionTypes[indexPath.section].mentionType == .media ? "MentionImageTableViewCell": "MentionLabelTableViewCell"
         let mentionCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
 
         if let imageCell = mentionCell as? MentionImageTableViewCell, selectedTweet != nil
         {
             imageCell.mentionUrl = selectedTweet?.media[indexPath.row].url
-        } else if let labelCell = mentionCell as? MentionLabelTableViewCell, selectedTweet != nil {
-            labelCell.mentionLabel.text = MentionTypes.getCurrentType(by: mentionTypes[indexPath.section].mentionType,
-                                                                      from: selectedTweet!)?[indexPath.row].keyword
+        } else {
+            mentionCell.textLabel?.text = MentionTypes.getCurrentType(by: mentionTypes[indexPath.section].mentionType,
+                                                                    from: selectedTweet!)?[indexPath.row].keyword
         }
 
         return mentionCell
